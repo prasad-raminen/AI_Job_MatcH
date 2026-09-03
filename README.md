@@ -10,8 +10,9 @@ An AI-powered web application built for job seekers and recruiters to analyze re
 
 ## 🚀 Live Demo & Documentation
 
-* 🌐 **[View Live Web App](https://skillians.vercel.app)**
+* 🌐 **[View Live Web App](https://aijobmatch-six.vercel.app)**
 * 📖 **[Read Full Technical Documentation & Architecture Guide (DOCUMENTATION.md)](DOCUMENTATION.md)**
+
 
 ---
 

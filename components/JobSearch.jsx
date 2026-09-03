@@ -1,29 +1,43 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const PRESET_KEYWORDS = ['Software Engineer', 'Frontend Engineer', 'Full Stack', 'Python Developer', 'DevOps'];
 
 export default function JobSearch({ onJobsFound, onAddManualJob, loading }) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState('Software Engineer');
   const [location, setLocation] = useState('');
   const [manualDesc, setManualDesc] = useState('');
   const [manualTitle, setManualTitle] = useState('');
   const [showManual, setShowManual] = useState(false);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  // Auto load initial jobs on mount
+  useEffect(() => {
+    fetchJobs('Software Engineer', '');
+  }, []);
+
+  const fetchJobs = async (searchQuery, searchLoc) => {
     try {
-      const params = new URLSearchParams({ q: query });
-      if (location.trim()) params.set('location', location);
+      const params = new URLSearchParams({ q: searchQuery || 'software engineer' });
+      if (searchLoc?.trim()) params.set('location', searchLoc);
       const res = await fetch(`/api/search-jobs?${params}`);
       const data = await res.json();
       if (data.success) {
         onJobsFound(data.jobs, data.source);
-      } else {
-        alert('Error: ' + (data.error || 'Search failed'));
       }
     } catch (err) {
-      alert('Error searching: ' + err.message);
+      console.error('Error fetching jobs:', err);
     }
+  };
+
+  const handleSearch = async (e) => {
+    e?.preventDefault();
+    if (!query.trim()) return;
+    await fetchJobs(query, location);
+  };
+
+  const handlePresetClick = (preset) => {
+    setQuery(preset);
+    fetchJobs(preset, location);
   };
 
   const handleAddManual = () => {
@@ -64,12 +78,27 @@ export default function JobSearch({ onJobsFound, onAddManualJob, loading }) {
         </button>
       </form>
 
+      {/* Preset Keyword Badges */}
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Quick Filters:</span>
+        {PRESET_KEYWORDS.map((kw) => (
+          <button
+            key={kw}
+            className="skill-tag"
+            onClick={() => handlePresetClick(kw)}
+            style={{ cursor: 'pointer', background: query === kw ? 'var(--accent-gradient)' : undefined, color: query === kw ? 'white' : undefined }}
+          >
+            {kw}
+          </button>
+        ))}
+      </div>
+
       <div style={{ marginTop: '1rem' }}>
         <button
           className="btn btn-secondary btn-sm"
           onClick={() => setShowManual(!showManual)}
         >
-          {showManual ? '✕ Cancel' : '📋 Paste Job Description'}
+          {showManual ? '✕ Cancel' : '📋 Paste Custom Job Description'}
         </button>
       </div>
 
@@ -106,3 +135,4 @@ export default function JobSearch({ onJobsFound, onAddManualJob, loading }) {
     </div>
   );
 }
+
