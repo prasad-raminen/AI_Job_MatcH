@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-const PRESET_KEYWORDS = ['Software Engineer', 'Frontend Engineer', 'Full Stack', 'Python Developer', 'DevOps'];
+const PRESET_KEYWORDS = ['Software Engineer', 'Frontend Engineer', 'Full Stack', 'Python Developer', 'DevOps', 'Data Scientist'];
 
 export default function JobSearch({ onJobsFound, onAddManualJob, loading }) {
   const [query, setQuery] = useState('Software Engineer');
@@ -59,34 +59,38 @@ export default function JobSearch({ onJobsFound, onAddManualJob, loading }) {
 
   return (
     <div>
-      <form className="search-bar" onSubmit={handleSearch}>
-        <input
-          className="input"
-          placeholder="Job title (e.g. Software Engineer)"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <input
-          className="input"
-          placeholder="Location (optional)"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          style={{ maxWidth: '200px' }}
-        />
+      <form className="search-bar-v2" onSubmit={handleSearch}>
+        <div className="search-input-group">
+          <span className="search-icon">🔍</span>
+          <input
+            className="search-input"
+            placeholder="Job title (e.g. Software Engineer)"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <div className="search-input-group search-loc">
+          <span className="search-icon">📍</span>
+          <input
+            className="search-input"
+            placeholder="Location (optional)"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
+        </div>
         <button className="btn btn-primary" type="submit" disabled={loading || !query.trim()}>
           {loading ? '⏳' : '🔍'} Search
         </button>
       </form>
 
-      {/* Preset Keyword Badges */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Quick Filters:</span>
+      {/* Quick Filter Chips */}
+      <div className="filter-chips">
+        <span className="filter-label">Quick:</span>
         {PRESET_KEYWORDS.map((kw) => (
           <button
             key={kw}
-            className="skill-tag"
+            className={`filter-chip ${query === kw ? 'chip-active' : ''}`}
             onClick={() => handlePresetClick(kw)}
-            style={{ cursor: 'pointer', background: query === kw ? 'var(--accent-gradient)' : undefined, color: query === kw ? 'white' : undefined }}
           >
             {kw}
           </button>
@@ -94,45 +98,27 @@ export default function JobSearch({ onJobsFound, onAddManualJob, loading }) {
       </div>
 
       <div style={{ marginTop: '1rem' }}>
-        <button
-          className="btn btn-secondary btn-sm"
-          onClick={() => setShowManual(!showManual)}
-        >
+        <button className="btn btn-secondary btn-sm" onClick={() => setShowManual(!showManual)}>
           {showManual ? '✕ Cancel' : '📋 Paste Custom Job Description'}
         </button>
       </div>
 
-      {showManual && (
-        <div className="paste-job-section glass-card" style={{ marginTop: '1rem' }}>
-          <h3>Add Custom Job Description</h3>
+      <div className={`manual-job-section ${showManual ? 'manual-open' : ''}`}>
+        <div className="glass-card" style={{ marginTop: '1rem' }}>
+          <h3 style={{ fontSize: '1rem', marginBottom: '0.75rem', fontWeight: '600' }}>Add Custom Job Description</h3>
           <div className="input-group" style={{ marginBottom: '0.75rem' }}>
             <label>Job Title</label>
-            <input
-              className="input"
-              placeholder="e.g. Senior Frontend Developer"
-              value={manualTitle}
-              onChange={(e) => setManualTitle(e.target.value)}
-            />
+            <input className="input" placeholder="e.g. Senior Frontend Developer" value={manualTitle} onChange={(e) => setManualTitle(e.target.value)} />
           </div>
           <div className="input-group" style={{ marginBottom: '0.75rem' }}>
             <label>Job Description</label>
-            <textarea
-              className="textarea"
-              placeholder="Paste the full job description here..."
-              value={manualDesc}
-              onChange={(e) => setManualDesc(e.target.value)}
-            />
+            <textarea className="textarea" placeholder="Paste the full job description here..." value={manualDesc} onChange={(e) => setManualDesc(e.target.value)} />
           </div>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={handleAddManual}
-            disabled={!manualDesc.trim()}
-          >
+          <button className="btn btn-primary btn-sm" onClick={handleAddManual} disabled={!manualDesc.trim()}>
             ➕ Add Job
           </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
-
